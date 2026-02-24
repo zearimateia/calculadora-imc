@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de IMC</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Blobs animados no fundo -->
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+  <div class="bg-blob bg-blob-3"></div>
+
+  <div class="card">
+
+    <!-- Barra de progresso -->
+    <div class="steps-bar">
+      <div class="step-item ativo" id="si-1">
+        <div class="step-circle"><span>1</span></div>
+        <span class="step-label">Cadastro</span>
+      </div>
+      <div class="step-line" id="sl-1"></div>
+      <div class="step-item" id="si-2">
+        <div class="step-circle"><span>2</span></div>
+        <span class="step-label">Calcular</span>
+      </div>
+      <div class="step-line" id="sl-2"></div>
+      <div class="step-item" id="si-3">
+        <div class="step-circle"><span>3</span></div>
+        <span class="step-label">Resultado</span>
+      </div>
+    </div>
+
+    <!-- ETAPA 1: Cadastro -->
+    <div class="step ativo" id="step-cadastro">
+      <div class="step-header">
+        <span class="step-icon">👋</span>
+        <h1>Bem-vindo!</h1>
+        <p>Preencha seus dados para calcular seu IMC gratuitamente</p>
+      </div>
+
+      <div class="form-group">
+        <label for="cad-nome">Nome completo</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" id="cad-nome" placeholder="Ex: João Silva" autocomplete="name" />
+        </div>
+        <span class="campo-erro" id="erro-nome">Por favor, informe seu nome.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="cad-email">E-mail</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="cad-email" placeholder="Ex: joao@email.com" autocomplete="email" />
+        </div>
+        <span class="campo-erro" id="erro-email">Por favor, informe um e-mail válido.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="cad-telefone">WhatsApp / Telefone</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">📱</span>
+          <input type="tel" id="cad-telefone" placeholder="Ex: (11) 99999-9999" autocomplete="tel" />
+        </div>
+        <span class="campo-erro" id="erro-telefone">Por favor, informe seu telefone.</span>
+      </div>
+
+      <button class="btn-primary" id="btn-cadastrar" onclick="irParaCalculadora()">
+        <span class="spinner" id="spinner-cadastro"></span>
+        <span id="btn-cadastrar-texto">Próximo →</span>
+      </button>
+      <p class="privacy-note">🔒 Seus dados estão seguros e não serão compartilhados.</p>
+    </div>
+
+    <!-- ETAPA 2: Calculadora -->
+    <div class="step" id="step-calculadora">
+      <div class="step-header">
+        <span class="step-icon">⚖️</span>
+        <h1 id="saudacao">Olá!</h1>
+        <p>Informe suas medidas para calcularmos seu IMC</p>
+      </div>
+
+      <div class="form-group">
+        <label for="peso">Peso</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">🏋️</span>
+          <input type="number" id="peso" placeholder="Ex: 70" min="1" max="500" step="0.1" />
+          <span class="unit">kg</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="altura">Altura</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">📏</span>
+          <input type="number" id="altura" placeholder="Ex: 175" min="1" max="300" step="1" />
+          <span class="unit">cm</span>
+        </div>
+      </div>
+
+      <div id="erro-medidas" class="erro-medidas" style="display:none">
+        Por favor, preencha peso e altura válidos.
+      </div>
+
+      <button class="btn-primary" onclick="calcular()">Calcular IMC</button>
+      <button class="btn-secondary" onclick="voltarCadastro()">← Voltar</button>
+    </div>
+
+    <!-- ETAPA 3: Resultado -->
+    <div class="step" id="step-resultado">
+      <div class="result" id="result"></div>
+
+      <!-- Status do salvamento -->
+      <div class="save-status" id="save-status"></div>
+
+      <!-- Seção de objetivo -->
+      <div class="objetivo-section" id="objetivo-section">
+        <h2>🎯 Qual é o seu objetivo?</h2>
+        <p>Escolha uma meta para receber seu plano alimentar personalizado</p>
+        <div class="objetivo-grid">
+          <button class="objetivo-btn" onclick="mostrarPlano('emagrecer')">
+            <span class="obj-icon">🔥</span>Emagrecer
+          </button>
+          <button class="objetivo-btn" onclick="mostrarPlano('massa')">
+            <span class="obj-icon">💪</span>Ganhar massa
+          </button>
+          <button class="objetivo-btn" onclick="mostrarPlano('manter')">
+            <span class="obj-icon">⚖️</span>Manter peso
+          </button>
+          <button class="objetivo-btn" onclick="mostrarPlano('saude')">
+            <span class="obj-icon">🌿</span>Melhorar saúde
+          </button>
+        </div>
+      </div>
+
+      <!-- Plano alimentar -->
+      <div class="plano-section" id="plano-section"></div>
+
+      <!-- Diário de Refeições -->
+      <div class="diario-section" id="diario-section">
+        <h3 class="diario-title">📸 Diário de Refeições</h3>
+        <p class="diario-subtitle">Registre suas refeições com foto para acompanhar sua alimentação</p>
+
+        <div class="diario-form">
+          <div class="foto-upload-area" id="foto-upload-area" onclick="abrirCamera()">
+            <div class="foto-placeholder" id="foto-placeholder">
+              <span class="foto-icon">📷</span>
+              <span class="foto-texto">Toque para tirar uma foto</span>
+              <span class="foto-subtexto">ou selecionar da galeria</span>
+            </div>
+            <img id="foto-preview" class="foto-preview" alt="Preview da refeição" />
+            <button type="button" class="foto-remover" id="foto-remover" onclick="removerFoto(event)">✕</button>
+          </div>
+          <input type="file" id="foto-input" accept="image/*" capture="environment" style="display:none" />
+
+          <div class="diario-campos">
+            <div class="form-group" style="margin-bottom:10px">
+              <label for="refeicao-tipo">Tipo de refeição</label>
+              <select id="refeicao-tipo" class="select-refeicao">
+                <option value="cafe">☀️ Café da Manhã</option>
+                <option value="lanche-manha">🍎 Lanche da Manhã</option>
+                <option value="almoco">🍽️ Almoço</option>
+                <option value="lanche-tarde">🍊 Lanche da Tarde</option>
+                <option value="jantar">🌙 Jantar</option>
+                <option value="outro">🍴 Outro</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:10px">
+              <label for="refeicao-descricao">Descrição (opcional)</label>
+              <textarea id="refeicao-descricao" class="textarea-refeicao" placeholder="Ex: Arroz integral, frango grelhado e salada..." rows="2"></textarea>
+            </div>
+          </div>
+
+          <button class="btn-primary btn-registrar" id="btn-registrar" onclick="registrarRefeicao()">
+            📸 Registrar Refeição
+          </button>
+          <div class="diario-erro" id="diario-erro" style="display:none">
+            Por favor, tire uma foto da sua refeição antes de registrar.
+          </div>
+        </div>
+
+        <div class="refeicoes-historico" id="refeicoes-historico"></div>
+      </div>
+
+      <!-- Histórico de cálculos -->
+      <div class="historico-section" id="historico-section">
+        <h3 class="historico-title">📊 Seu Histórico</h3>
+        <div class="historico-list" id="historico-list">
+          <p class="historico-vazio">Carregando...</p>
+        </div>
+      </div>
+
+      <p class="table-title">Tabela de Referência</p>
+      <table class="reference-table" id="reference-table">
+        <thead>
+          <tr>
+            <th>Classificação</th>
+            <th>IMC</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-cat="underweight">
+            <td><span class="dot" style="background:#0369a1"></span>Abaixo do peso</td>
+            <td>&lt; 18.5</td>
+          </tr>
+          <tr data-cat="normal">
+            <td><span class="dot" style="background:#15803d"></span>Peso normal</td>
+            <td>18.5 – 24.9</td>
+          </tr>
+          <tr data-cat="overweight">
+            <td><span class="dot" style="background:#a16207"></span>Sobrepeso</td>
+            <td>25.0 – 29.9</td>
+          </tr>
+          <tr data-cat="obese1">
+            <td><span class="dot" style="background:#c2410c"></span>Obesidade Grau I</td>
+            <td>30.0 – 34.9</td>
+          </tr>
+          <tr data-cat="obese2">
+            <td><span class="dot" style="background:#b91c1c"></span>Obesidade Grau II</td>
+            <td>35.0 – 39.9</td>
+          </tr>
+          <tr data-cat="obese3">
+            <td><span class="dot" style="background:#9d174d"></span>Obesidade Grau III</td>
+            <td>&ge; 40.0</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- CTA Suplemento -->
+      <div class="cta-suplemento" id="cta-suplemento">
+        <div class="cta-badge">RECOMENDADO</div>
+        <h3>🔥 Acelere seus resultados!</h3>
+        <p>Potencialize seu objetivo com um suplemento natural que auxilia na queima de gordura e no controle do apetite.</p>
+        <ul class="cta-benefits">
+          <li>✅ 100% natural e seguro</li>
+          <li>✅ Acelera o metabolismo</li>
+          <li>✅ Reduz a fome e a ansiedade</li>
+          <li>✅ Resultados visíveis em semanas</li>
+        </ul>
+        <a href="https://reduburn.com/" target="_blank" rel="noopener" class="btn-cta-suplemento">
+          Quero conhecer o suplemento →
+        </a>
+        <p class="cta-disclaimer">*Consulte um profissional de saúde antes de iniciar qualquer suplementação.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Popup Back Redirect -->
+  <div class="popup-overlay" id="popup-acompanhamento">
+    <div class="popup-box">
+      <button class="popup-close" onclick="fecharPopup()">✕</button>
+      <span class="popup-icon">🩺</span>
+      <h2>Espere! Quer resultados de verdade?</h2>
+      <p>Um <strong>nutricionista profissional</strong> pode criar um plano 100% personalizado para o seu corpo e objetivo.</p>
+      <ul class="popup-benefits">
+        <li>✅ Cardápio feito para você</li>
+        <li>✅ Acompanhamento semanal</li>
+        <li>✅ Ajustes conforme sua evolução</li>
+        <li>✅ Suporte direto pelo WhatsApp</li>
+      </ul>
+      <button class="popup-btn-primary" onclick="irParaAcompanhamento()">
+        Quero acompanhamento profissional!
+      </button>
+      <button class="popup-btn-secondary" onclick="fecharPopup()">
+        Não, obrigado. Prefiro continuar sozinho.
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal foto expandida -->
+  <div class="foto-modal-overlay" id="foto-modal" onclick="fecharFotoModal()">
+    <img class="foto-modal-img" id="foto-modal-img" alt="Foto da refeição" />
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
