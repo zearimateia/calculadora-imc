@@ -1339,6 +1339,241 @@ label {
   animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ===== ABAS (TABS) ===== */
+.tabs-nav {
+  display: flex;
+  gap: 6px;
+  background: #f1f5f9;
+  border-radius: 14px;
+  padding: 4px;
+  margin-bottom: 22px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 11px 10px;
+  border: none;
+  border-radius: 11px;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.tab-btn.ativo {
+  background: linear-gradient(135deg, #E74C3C, #922B21);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(192, 57, 43, 0.35);
+}
+
+.tab-btn:not(.ativo):hover {
+  background: #e2e8f0;
+  color: var(--text);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.ativo {
+  display: block;
+  animation: fadeIn 0.35s ease;
+}
+
+/* ===== EXERCÍCIOS DIÁRIOS ===== */
+.exercicios-header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.exercicios-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 8px;
+  animation: iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.exercicios-titulo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #922B21, #E74C3C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.exercicios-data {
+  font-size: 0.83rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.exercicios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.exercicio-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.exercicio-card:hover {
+  border-color: #e8b4b4;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.exercicio-card:has(.exercicio-check:checked) {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.exercicio-check {
+  display: none;
+}
+
+.exercicio-checkmark {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  border: 2px solid #cbd5e1;
+  background: #fff;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s;
+  position: relative;
+}
+
+.exercicio-checkmark::after {
+  content: '✓';
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.exercicio-check:checked ~ .exercicio-checkmark {
+  background: linear-gradient(135deg, #E74C3C, #922B21);
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(192, 57, 43, 0.35);
+}
+
+.exercicio-check:checked ~ .exercicio-checkmark::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.exercicio-emoji {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.exercicio-nome {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ===== EXERCÍCIOS HISTÓRICO ===== */
+.exercicios-historico {
+  margin-top: 22px;
+  padding: 18px;
+  background: #fdf8f8;
+  border-radius: 16px;
+  border: 1px solid #f0d4d4;
+}
+
+.exercicios-historico-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--primary-dark);
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.exercicios-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.exercicios-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+
+.exercicios-dia.hoje {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.15);
+}
+
+.exercicios-dia-nome {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+}
+
+.exercicios-dia-num {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.exercicios-dia-prog {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  background: #f1f5f9;
+  color: #94a3b8;
+  transition: all 0.3s;
+}
+
+.exercicios-dia-prog.feito {
+  background: linear-gradient(135deg, #E74C3C, #922B21);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(192, 57, 43, 0.3);
+}
+
+.exercicios-dia-prog.parcial {
+  background: #fef9c3;
+  color: #a16207;
+  border: 2px solid #facc15;
+}
+
 /* ===== RESPONSIVIDADE ===== */
 @media (max-width: 480px) {
   .card {
@@ -1367,5 +1602,27 @@ label {
   .refeicao-registro-foto {
     width: 64px;
     height: 64px;
+  }
+
+  .exercicios-semana {
+    gap: 4px;
+  }
+
+  .exercicios-dia {
+    padding: 6px 2px;
+  }
+
+  .exercicios-dia-prog {
+    width: 24px;
+    height: 24px;
+    font-size: 0.56rem;
+  }
+
+  .exercicios-dia-nome {
+    font-size: 0.55rem;
+  }
+
+  .exercicios-dia-num {
+    font-size: 0.65rem;
   }
 }

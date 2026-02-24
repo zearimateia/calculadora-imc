@@ -1,6 +1,18 @@
 // ===== URL GOOGLE SHEETS =====
 const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbztHUM-N_XkOlQOyY-SLepAFDOMILzTWMUixN6K6wD0wjg7BJUeNNpcR9M0yC0RGkdwHg/exec';
 
+// ===== SUPABASE =====
+const SUPABASE_URL = 'https://vykzjkzefzagowndoynd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ5a3pqa3plZnphZ293bmRveW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MDcyNjksImV4cCI6MjA4NzM4MzI2OX0.2hObUpaB6NKfyJI22tjzDTdjBYd5Rq5loT5MDuD3tPs';
+let supabaseClient = null;
+try {
+  if (window.supabase && window.supabase.createClient) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+} catch (e) {
+  console.warn('Supabase não carregou:', e);
+}
+
 // ===== DADOS DE CATEGORIAS =====
 const categories = [
   {
@@ -575,4 +587,218 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
   if (stepAtual === 1) irParaCalculadora();
   if (stepAtual === 2) calcular();
-})
+});
+
+// ===== ABAS (TABS) =====
+function trocarAba(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('ativo', btn.dataset.tab === tabId);
+  });
+  document.querySelectorAll('.tab-content').forEach(tc => {
+    tc.classList.toggle('ativo', tc.id === tabId);
+  });
+  if (tabId === 'tab-exercicios') {
+    atualizarDataExercicios();
+    carregarExerciciosDoDia();
+    carregarHistoricoExercicios();
+  }
+}
+
+// ===== EXERCÍCIOS DIÁRIOS =====
+function getDataHoje() {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function atualizarDataExercicios() {
+  const el = document.getElementById('exercicios-data');
+  if (el) {
+    const d = new Date();
+    el.textContent = d.toLocaleDateString('pt-BR', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
+  }
+}
+
+function getNomeUsuarioAtual() {
+  if (nomeUsuario) return nomeUsuario;
+  const leads = JSON.parse(localStorage.getItem('imc_leads') || '[]');
+  if (leads.length > 0) return leads[leads.length - 1].nome.split(' ')[0];
+  return 'Anônimo';
+}
+
+function getExerciciosMarcados() {
+  const checks = document.querySelectorAll('.exercicio-check:checked');
+  return Array.from(checks).map(c => c.value);
+}
+
+function marcarExercicios(lista) {
+  document.querySelectorAll('.exercicio-check').forEach(c => {
+    c.checked = lista.includes(c.value);
+  });
+}
+
+async function carregarExerciciosDoDia() {
+  const nome = getNomeUsuarioAtual();
+  const data = getDataHoje();
+
+  // Tenta buscar do Supabase
+  if (supabaseClient) {
+    try {
+      const { data: rows, error } = await supabaseClient
+        .from('exercicios_diarios')
+        .select('exercicios')
+        .eq('nome', nome)
+        .eq('data', data)
+        .limit(1);
+
+      if (!error && rows && rows.length > 0) {
+        marcarExercicios(rows[0].exercicios || []);
+        return;
+      }
+    } catch (_) {}
+  }
+
+  // Fallback localStorage
+  const local = JSON.parse(localStorage.getItem('exercicios_local') || '{}');
+  if (local[data]) {
+    marcarExercicios(local[data]);
+  } else {
+    marcarExercicios([]);
+  }
+}
+
+function mostrarStatusExercicios(tipo, mensagem) {
+  const el = document.getElementById('exercicios-status');
+  el.className = 'save-status ' + tipo;
+  el.textContent = mensagem;
+  if (tipo === 'salvo') {
+    setTimeout(() => { el.className = 'save-status'; el.textContent = ''; }, 3000);
+  }
+}
+
+async function salvarExercicios() {
+  const exercicios = getExerciciosMarcados();
+  const nome = getNomeUsuarioAtual();
+  const data = getDataHoje();
+
+  const btn = document.getElementById('btn-salvar-exercicios');
+  const spinner = document.getElementById('spinner-exercicios');
+  const texto = document.getElementById('btn-exercicios-texto');
+
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  texto.textContent = 'Salvando...';
+  mostrarStatusExercicios('salvando', '⏳ Salvando exercícios...');
+
+  // Salva no localStorage como fallback
+  const local = JSON.parse(localStorage.getItem('exercicios_local') || '{}');
+  local[data] = exercicios;
+  localStorage.setItem('exercicios_local', JSON.stringify(local));
+
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient
+        .from('exercicios_diarios')
+        .upsert(
+          { nome, data, exercicios },
+          { onConflict: 'nome,data' }
+        );
+
+      if (error) throw error;
+
+      mostrarStatusExercicios('salvo', '✅ Exercícios salvos com sucesso!');
+    } catch (err) {
+      console.error('Erro ao salvar exercícios:', err);
+      mostrarStatusExercicios('erro', '❌ Erro ao salvar. Dados guardados localmente.');
+    }
+  } else {
+    mostrarStatusExercicios('salvo', '✅ Exercícios salvos localmente!');
+  }
+
+  btn.disabled = false;
+  spinner.style.display = 'none';
+  texto.textContent = 'Salvar Exercícios';
+
+  carregarHistoricoExercicios();
+}
+
+async function carregarHistoricoExercicios() {
+  const container = document.getElementById('exercicios-semana');
+  if (!container) return;
+
+  const nome = getNomeUsuarioAtual();
+  const hoje = new Date();
+  const dias = [];
+
+  // Gera os últimos 7 dias
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(hoje);
+    d.setDate(hoje.getDate() - i);
+    dias.push({
+      date: d,
+      iso: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'),
+      dia: d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', ''),
+      num: d.getDate(),
+      isHoje: i === 0
+    });
+  }
+
+  const dataInicio = dias[0].iso;
+  const dataFim = dias[6].iso;
+
+  let registros = {};
+
+  // Busca do Supabase
+  if (supabaseClient) {
+    try {
+      const { data: rows, error } = await supabaseClient
+        .from('exercicios_diarios')
+        .select('data, exercicios')
+        .eq('nome', nome)
+        .gte('data', dataInicio)
+        .lte('data', dataFim);
+
+      if (!error && rows) {
+        rows.forEach(r => { registros[r.data] = r.exercicios || []; });
+      }
+    } catch (_) {}
+  }
+
+  // Merge com localStorage
+  const local = JSON.parse(localStorage.getItem('exercicios_local') || '{}');
+  dias.forEach(d => {
+    if (!registros[d.iso] && local[d.iso]) {
+      registros[d.iso] = local[d.iso];
+    }
+  });
+
+  const totalExercicios = 5;
+
+  container.innerHTML = dias.map(d => {
+    const exs = registros[d.iso] || [];
+    const count = exs.length;
+    let progClass = '';
+    let progText = '0';
+
+    if (count === totalExercicios) {
+      progClass = 'feito';
+      progText = '✓';
+    } else if (count > 0) {
+      progClass = 'parcial';
+      progText = count + '/' + totalExercicios;
+    } else {
+      progText = '–';
+    }
+
+    return `
+      <div class="exercicios-dia ${d.isHoje ? 'hoje' : ''}">
+        <span class="exercicios-dia-nome">${d.dia}</span>
+        <span class="exercicios-dia-num">${d.num}</span>
+        <div class="exercicios-dia-prog ${progClass}">${progText}</div>
+      </div>
+    `;
+  }).join('');
+}

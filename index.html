@@ -112,141 +112,207 @@
 
     <!-- ETAPA 3: Resultado -->
     <div class="step" id="step-resultado">
-      <div class="result" id="result"></div>
 
-      <!-- Status do salvamento -->
-      <div class="save-status" id="save-status"></div>
-
-      <!-- Seção de objetivo -->
-      <div class="objetivo-section" id="objetivo-section">
-        <h2>🎯 Qual é o seu objetivo?</h2>
-        <p>Escolha uma meta para receber seu plano alimentar personalizado</p>
-        <div class="objetivo-grid">
-          <button class="objetivo-btn" onclick="mostrarPlano('emagrecer')">
-            <span class="obj-icon">🔥</span>Emagrecer
-          </button>
-          <button class="objetivo-btn" onclick="mostrarPlano('massa')">
-            <span class="obj-icon">💪</span>Ganhar massa
-          </button>
-          <button class="objetivo-btn" onclick="mostrarPlano('manter')">
-            <span class="obj-icon">⚖️</span>Manter peso
-          </button>
-          <button class="objetivo-btn" onclick="mostrarPlano('saude')">
-            <span class="obj-icon">🌿</span>Melhorar saúde
-          </button>
-        </div>
+      <!-- Navegação por abas -->
+      <div class="tabs-nav">
+        <button class="tab-btn ativo" data-tab="tab-resultado" onclick="trocarAba('tab-resultado')">📊 Resultado</button>
+        <button class="tab-btn" data-tab="tab-exercicios" onclick="trocarAba('tab-exercicios')">🏋️ Exercícios</button>
       </div>
 
-      <!-- Plano alimentar -->
-      <div class="plano-section" id="plano-section"></div>
+      <!-- ABA: Resultado -->
+      <div class="tab-content ativo" id="tab-resultado">
+        <div class="result" id="result"></div>
 
-      <!-- Diário de Refeições -->
-      <div class="diario-section" id="diario-section">
-        <h3 class="diario-title">📸 Diário de Refeições</h3>
-        <p class="diario-subtitle">Registre suas refeições com foto para acompanhar sua alimentação</p>
+        <!-- Status do salvamento -->
+        <div class="save-status" id="save-status"></div>
 
-        <div class="diario-form">
-          <div class="foto-upload-area" id="foto-upload-area" onclick="abrirCamera()">
-            <div class="foto-placeholder" id="foto-placeholder">
-              <span class="foto-icon">📷</span>
-              <span class="foto-texto">Toque para tirar uma foto</span>
-              <span class="foto-subtexto">ou selecionar da galeria</span>
-            </div>
-            <img id="foto-preview" class="foto-preview" alt="Preview da refeição" />
-            <button type="button" class="foto-remover" id="foto-remover" onclick="removerFoto(event)">✕</button>
-          </div>
-          <input type="file" id="foto-input" accept="image/*" capture="environment" style="display:none" />
-
-          <div class="diario-campos">
-            <div class="form-group" style="margin-bottom:10px">
-              <label for="refeicao-tipo">Tipo de refeição</label>
-              <select id="refeicao-tipo" class="select-refeicao">
-                <option value="cafe">☀️ Café da Manhã</option>
-                <option value="lanche-manha">🍎 Lanche da Manhã</option>
-                <option value="almoco">🍽️ Almoço</option>
-                <option value="lanche-tarde">🍊 Lanche da Tarde</option>
-                <option value="jantar">🌙 Jantar</option>
-                <option value="outro">🍴 Outro</option>
-              </select>
-            </div>
-
-            <div class="form-group" style="margin-bottom:10px">
-              <label for="refeicao-descricao">Descrição (opcional)</label>
-              <textarea id="refeicao-descricao" class="textarea-refeicao" placeholder="Ex: Arroz integral, frango grelhado e salada..." rows="2"></textarea>
-            </div>
-          </div>
-
-          <button class="btn-primary btn-registrar" id="btn-registrar" onclick="registrarRefeicao()">
-            📸 Registrar Refeição
-          </button>
-          <div class="diario-erro" id="diario-erro" style="display:none">
-            Por favor, tire uma foto da sua refeição antes de registrar.
+        <!-- Seção de objetivo -->
+        <div class="objetivo-section" id="objetivo-section">
+          <h2>🎯 Qual é o seu objetivo?</h2>
+          <p>Escolha uma meta para receber seu plano alimentar personalizado</p>
+          <div class="objetivo-grid">
+            <button class="objetivo-btn" onclick="mostrarPlano('emagrecer')">
+              <span class="obj-icon">🔥</span>Emagrecer
+            </button>
+            <button class="objetivo-btn" onclick="mostrarPlano('massa')">
+              <span class="obj-icon">💪</span>Ganhar massa
+            </button>
+            <button class="objetivo-btn" onclick="mostrarPlano('manter')">
+              <span class="obj-icon">⚖️</span>Manter peso
+            </button>
+            <button class="objetivo-btn" onclick="mostrarPlano('saude')">
+              <span class="obj-icon">🌿</span>Melhorar saúde
+            </button>
           </div>
         </div>
 
-        <div class="refeicoes-historico" id="refeicoes-historico"></div>
-      </div>
+        <!-- Plano alimentar -->
+        <div class="plano-section" id="plano-section"></div>
 
-      <!-- Histórico de cálculos -->
-      <div class="historico-section" id="historico-section">
-        <h3 class="historico-title">📊 Seu Histórico</h3>
-        <div class="historico-list" id="historico-list">
-          <p class="historico-vazio">Carregando...</p>
+        <!-- Diário de Refeições -->
+        <div class="diario-section" id="diario-section">
+          <h3 class="diario-title">📸 Diário de Refeições</h3>
+          <p class="diario-subtitle">Registre suas refeições com foto para acompanhar sua alimentação</p>
+
+          <div class="diario-form">
+            <div class="foto-upload-area" id="foto-upload-area" onclick="abrirCamera()">
+              <div class="foto-placeholder" id="foto-placeholder">
+                <span class="foto-icon">📷</span>
+                <span class="foto-texto">Toque para tirar uma foto</span>
+                <span class="foto-subtexto">ou selecionar da galeria</span>
+              </div>
+              <img id="foto-preview" class="foto-preview" alt="Preview da refeição" />
+              <button type="button" class="foto-remover" id="foto-remover" onclick="removerFoto(event)">✕</button>
+            </div>
+            <input type="file" id="foto-input" accept="image/*" capture="environment" style="display:none" />
+
+            <div class="diario-campos">
+              <div class="form-group" style="margin-bottom:10px">
+                <label for="refeicao-tipo">Tipo de refeição</label>
+                <select id="refeicao-tipo" class="select-refeicao">
+                  <option value="cafe">☀️ Café da Manhã</option>
+                  <option value="lanche-manha">🍎 Lanche da Manhã</option>
+                  <option value="almoco">🍽️ Almoço</option>
+                  <option value="lanche-tarde">🍊 Lanche da Tarde</option>
+                  <option value="jantar">🌙 Jantar</option>
+                  <option value="outro">🍴 Outro</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom:10px">
+                <label for="refeicao-descricao">Descrição (opcional)</label>
+                <textarea id="refeicao-descricao" class="textarea-refeicao" placeholder="Ex: Arroz integral, frango grelhado e salada..." rows="2"></textarea>
+              </div>
+            </div>
+
+            <button class="btn-primary btn-registrar" id="btn-registrar" onclick="registrarRefeicao()">
+              📸 Registrar Refeição
+            </button>
+            <div class="diario-erro" id="diario-erro" style="display:none">
+              Por favor, tire uma foto da sua refeição antes de registrar.
+            </div>
+          </div>
+
+          <div class="refeicoes-historico" id="refeicoes-historico"></div>
+        </div>
+
+        <!-- Histórico de cálculos -->
+        <div class="historico-section" id="historico-section">
+          <h3 class="historico-title">📊 Seu Histórico</h3>
+          <div class="historico-list" id="historico-list">
+            <p class="historico-vazio">Carregando...</p>
+          </div>
+        </div>
+
+        <p class="table-title">Tabela de Referência</p>
+        <table class="reference-table" id="reference-table">
+          <thead>
+            <tr>
+              <th>Classificação</th>
+              <th>IMC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-cat="underweight">
+              <td><span class="dot" style="background:#0369a1"></span>Abaixo do peso</td>
+              <td>&lt; 18.5</td>
+            </tr>
+            <tr data-cat="normal">
+              <td><span class="dot" style="background:#15803d"></span>Peso normal</td>
+              <td>18.5 – 24.9</td>
+            </tr>
+            <tr data-cat="overweight">
+              <td><span class="dot" style="background:#a16207"></span>Sobrepeso</td>
+              <td>25.0 – 29.9</td>
+            </tr>
+            <tr data-cat="obese1">
+              <td><span class="dot" style="background:#c2410c"></span>Obesidade Grau I</td>
+              <td>30.0 – 34.9</td>
+            </tr>
+            <tr data-cat="obese2">
+              <td><span class="dot" style="background:#b91c1c"></span>Obesidade Grau II</td>
+              <td>35.0 – 39.9</td>
+            </tr>
+            <tr data-cat="obese3">
+              <td><span class="dot" style="background:#9d174d"></span>Obesidade Grau III</td>
+              <td>&ge; 40.0</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- CTA Suplemento -->
+        <div class="cta-suplemento" id="cta-suplemento">
+          <div class="cta-badge">RECOMENDADO</div>
+          <h3>🔥 Acelere seus resultados!</h3>
+          <p>Potencialize seu objetivo com um suplemento natural que auxilia na queima de gordura e no controle do apetite.</p>
+          <ul class="cta-benefits">
+            <li>✅ 100% natural e seguro</li>
+            <li>✅ Acelera o metabolismo</li>
+            <li>✅ Reduz a fome e a ansiedade</li>
+            <li>✅ Resultados visíveis em semanas</li>
+          </ul>
+          <a href="https://reduburn.com/" target="_blank" rel="noopener" class="btn-cta-suplemento">
+            Quero conhecer o suplemento →
+          </a>
+          <p class="cta-disclaimer">*Consulte um profissional de saúde antes de iniciar qualquer suplementação.</p>
         </div>
       </div>
 
-      <p class="table-title">Tabela de Referência</p>
-      <table class="reference-table" id="reference-table">
-        <thead>
-          <tr>
-            <th>Classificação</th>
-            <th>IMC</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr data-cat="underweight">
-            <td><span class="dot" style="background:#0369a1"></span>Abaixo do peso</td>
-            <td>&lt; 18.5</td>
-          </tr>
-          <tr data-cat="normal">
-            <td><span class="dot" style="background:#15803d"></span>Peso normal</td>
-            <td>18.5 – 24.9</td>
-          </tr>
-          <tr data-cat="overweight">
-            <td><span class="dot" style="background:#a16207"></span>Sobrepeso</td>
-            <td>25.0 – 29.9</td>
-          </tr>
-          <tr data-cat="obese1">
-            <td><span class="dot" style="background:#c2410c"></span>Obesidade Grau I</td>
-            <td>30.0 – 34.9</td>
-          </tr>
-          <tr data-cat="obese2">
-            <td><span class="dot" style="background:#b91c1c"></span>Obesidade Grau II</td>
-            <td>35.0 – 39.9</td>
-          </tr>
-          <tr data-cat="obese3">
-            <td><span class="dot" style="background:#9d174d"></span>Obesidade Grau III</td>
-            <td>&ge; 40.0</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- ABA: Exercícios -->
+      <div class="tab-content" id="tab-exercicios">
+        <div class="exercicios-header">
+          <span class="exercicios-icon">🏋️</span>
+          <h2 class="exercicios-titulo">Exercícios Diários</h2>
+          <p class="exercicios-data" id="exercicios-data"></p>
+        </div>
 
-      <!-- CTA Suplemento -->
-      <div class="cta-suplemento" id="cta-suplemento">
-        <div class="cta-badge">RECOMENDADO</div>
-        <h3>🔥 Acelere seus resultados!</h3>
-        <p>Potencialize seu objetivo com um suplemento natural que auxilia na queima de gordura e no controle do apetite.</p>
-        <ul class="cta-benefits">
-          <li>✅ 100% natural e seguro</li>
-          <li>✅ Acelera o metabolismo</li>
-          <li>✅ Reduz a fome e a ansiedade</li>
-          <li>✅ Resultados visíveis em semanas</li>
-        </ul>
-        <a href="https://reduburn.com/" target="_blank" rel="noopener" class="btn-cta-suplemento">
-          Quero conhecer o suplemento →
-        </a>
-        <p class="cta-disclaimer">*Consulte um profissional de saúde antes de iniciar qualquer suplementação.</p>
+        <div class="exercicios-lista" id="exercicios-lista">
+          <label class="exercicio-card" data-ex="caminhada">
+            <input type="checkbox" class="exercicio-check" value="caminhada" />
+            <span class="exercicio-checkmark"></span>
+            <span class="exercicio-emoji">🚶</span>
+            <span class="exercicio-nome">Caminhada 30min</span>
+          </label>
+          <label class="exercicio-card" data-ex="flexoes">
+            <input type="checkbox" class="exercicio-check" value="flexoes" />
+            <span class="exercicio-checkmark"></span>
+            <span class="exercicio-emoji">💪</span>
+            <span class="exercicio-nome">Flexões</span>
+          </label>
+          <label class="exercicio-card" data-ex="agachamentos">
+            <input type="checkbox" class="exercicio-check" value="agachamentos" />
+            <span class="exercicio-checkmark"></span>
+            <span class="exercicio-emoji">🦵</span>
+            <span class="exercicio-nome">Agachamentos</span>
+          </label>
+          <label class="exercicio-card" data-ex="prancha">
+            <input type="checkbox" class="exercicio-check" value="prancha" />
+            <span class="exercicio-checkmark"></span>
+            <span class="exercicio-emoji">🧘</span>
+            <span class="exercicio-nome">Prancha</span>
+          </label>
+          <label class="exercicio-card" data-ex="alongamento">
+            <input type="checkbox" class="exercicio-check" value="alongamento" />
+            <span class="exercicio-checkmark"></span>
+            <span class="exercicio-emoji">🤸</span>
+            <span class="exercicio-nome">Alongamento</span>
+          </label>
+        </div>
+
+        <button class="btn-primary" id="btn-salvar-exercicios" onclick="salvarExercicios()">
+          <span class="spinner" id="spinner-exercicios"></span>
+          <span id="btn-exercicios-texto">Salvar Exercícios</span>
+        </button>
+
+        <div class="save-status" id="exercicios-status"></div>
+
+        <!-- Histórico 7 dias -->
+        <div class="exercicios-historico" id="exercicios-historico">
+          <h3 class="exercicios-historico-title">Últimos 7 dias</h3>
+          <div class="exercicios-semana" id="exercicios-semana"></div>
+        </div>
       </div>
+
     </div>
 
   </div>
